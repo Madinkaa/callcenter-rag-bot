@@ -16,8 +16,9 @@ COLLECTION    = "callcenter-docs"
 CHROMA_FOLDER = "./chroma_db"
 EMBED_MODEL   = "text-embedding-3-small"
 LLM_MODEL     = "llama-3.3-70b-versatile"
-TOP_K         = 10
-MAX_HISTORY   = 10
+TOP_K         = 7
+MAX_HISTORY   = 6
+MAX_CONTEXT_CHARS = 4000  # ограничим размер контекста для LLM
 MIN_SIMILARITY = 0.15  # минимальный порог похожести для fallback
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -132,6 +133,9 @@ class RAGAgent:
             search_query = f"{last_user} {last_bot[:200]} {user_message}"
 
         context = search(search_query)
+        # Обрезаем контекст чтобы не превысить лимит токенов Groq
+        if len(context) > MAX_CONTEXT_CHARS:
+            context = context[:MAX_CONTEXT_CHARS] + "\n\n[часть контекста скрыта из-за ограничений размера]"
         system = {"role": "system", "content": SYSTEM_PROMPT.format(context=context)}
         self.history.append({"role": "user", "content": user_message})
         messages = [system] + self.history[-MAX_HISTORY:]
