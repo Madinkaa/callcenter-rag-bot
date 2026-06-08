@@ -7,8 +7,8 @@ __pycache__/
 .venv/
 venv/
 
-# ChromaDB (large binaries)
-chroma_db/
+# ChromaDB (large binaries) — исключаем только корневую, backend/chroma_db нужна для Railway
+/chroma_db/
 
 # Downloaded tools
 bin/
