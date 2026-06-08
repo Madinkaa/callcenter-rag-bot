@@ -16,9 +16,9 @@ COLLECTION    = "callcenter-docs"
 CHROMA_FOLDER = "./chroma_db"
 EMBED_MODEL   = "text-embedding-3-small"
 LLM_MODEL     = "llama-3.3-70b-versatile"
-TOP_K         = 7
-MAX_HISTORY   = 6
-MAX_CONTEXT_CHARS = 4000  # ограничим размер контекста для LLM
+TOP_K         = 3
+MAX_HISTORY   = 4
+MAX_CONTEXT_CHARS = 1800  # ограничим размер контекста для LLM
 MIN_SIMILARITY = 0.15  # минимальный порог похожести для fallback
 # ─────────────────────────────────────────────────────────────────────────────
 

@@ -18,8 +18,8 @@ DOCS_FOLDER   = "./docs"
 COLLECTION    = "callcenter-docs"
 CHROMA_FOLDER = "./chroma_db"
 EMBED_MODEL   = "text-embedding-3-small"
-MAX_CHUNK_LEN = 1200   # максимум символов в одном чанке
-MIN_CHUNK_LEN = 80     # минимум — иначе пропускаем
+MAX_CHUNK_LEN = 700    # максимум символов в одном чанке
+MIN_CHUNK_LEN = 30     # минимум — иначе пропускаем
 # ─────────────────────────────────────────────────────────────────────────────
 
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -52,6 +52,8 @@ def split_into_sections(text: str) -> list[str]:
         if current:
             joined = "\n".join(current).strip()
             if len(joined) >= MIN_CHUNK_LEN:
+                if len(joined) > MAX_CHUNK_LEN:
+                    joined = joined[:MAX_CHUNK_LEN]
                 chunks.append(joined)
         return []
 
@@ -76,6 +78,8 @@ def split_into_sections(text: str) -> list[str]:
                     buffer.append(line)
                     joined = "\n".join(buffer).strip()
                     if len(joined) >= MIN_CHUNK_LEN:
+                        if len(joined) > MAX_CHUNK_LEN:
+                            joined = joined[:MAX_CHUNK_LEN]
                         chunks.append(joined)
                     buffer = []
                 else:
@@ -85,6 +89,8 @@ def split_into_sections(text: str) -> list[str]:
         if buffer:
             joined = "\n".join(buffer).strip()
             if len(joined) >= MIN_CHUNK_LEN:
+                if len(joined) > MAX_CHUNK_LEN:
+                    joined = joined[:MAX_CHUNK_LEN]
                 chunks.append(joined)
         if current:
             flush()
