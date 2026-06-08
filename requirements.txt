@@ -1,0 +1,6 @@
+openai
+groq
+qdrant-client
+python-docx
+python-dotenv
+colorama
