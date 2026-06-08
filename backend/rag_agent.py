@@ -16,9 +16,9 @@ COLLECTION    = "callcenter-docs"
 CHROMA_FOLDER = "./chroma_db"
 EMBED_MODEL   = "text-embedding-3-small"
 LLM_MODEL     = "llama-3.3-70b-versatile"
-TOP_K         = 3
-MAX_HISTORY   = 3
-MAX_CONTEXT   = 2800
+TOP_K         = 4
+MAX_HISTORY   = 2
+MAX_CONTEXT   = 3800
 # ─────────────────────────────────────────────────────────────────────────────
 
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -130,7 +130,8 @@ class RAGAgent:
 
     def chat(self, user_message: str) -> str:
         search_query = user_message
-        if len(user_message.split()) <= 6 and self.history:
+        # Используем историю только для коротких уточняющих вопросов
+        if len(user_message.split()) <= 4 and self.history:
             last_user = next(
                 (m["content"] for m in reversed(self.history) if m["role"] == "user"), ""
             )
