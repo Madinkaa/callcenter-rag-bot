@@ -1,10 +1,9 @@
 """
-ingest.py — читает .docx файлы из папки docs/ и загружает в ChromaDB (локально).
-Разбивает документы по логическим блокам (абзацам/секциям), а не механически.
+ingest.py -- читает .docx файлы из папки docs/ и загружает в ChromaDB (локально)
+Запусти ОДИН РАЗ перед первым использованием чат-бота.
 """
 
 import os
-import re
 import uuid
 from docx import Document
 from openai import OpenAI
@@ -17,9 +16,9 @@ load_dotenv()
 DOCS_FOLDER   = "./docs"
 COLLECTION    = "callcenter-docs"
 CHROMA_FOLDER = "./chroma_db"
+CHUNK_SIZE    = 500
+CHUNK_OVERLAP = 100
 EMBED_MODEL   = "text-embedding-3-small"
-MAX_CHUNK_LEN = 1200   # максимум символов в одном чанке
-MIN_CHUNK_LEN = 30     # минимум — иначе пропускаем
 # ─────────────────────────────────────────────────────────────────────────────
 
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -31,77 +30,16 @@ def read_docx(path: str) -> str:
     return "\n".join(p.text for p in doc.paragraphs if p.text.strip())
 
 
-def split_into_sections(text: str) -> list[str]:
-    """
-    Разбивает текст на логические блоки:
-    1. Если есть маркеры Вопрос/Ответ — разбивает по ним
-    2. Иначе — объединяет короткие абзацы с последующими длинными
-    """
-    lines = [l.strip() for l in text.splitlines() if l.strip()]
-    if not lines:
-        return []
-
-    # Паттерн FAQ: строки начинающиеся с "Вопрос:" / "В.", "Ответ:" / "О."
-    faq_pattern = re.compile(r'^(?:\d+\.?\s*)?(?:Вопрос|В\.|Ответ|О\.)\s*[:\-]?\s*', re.IGNORECASE)
-    is_faq = any(faq_pattern.match(l) for l in lines)
-
+def chunk_text(text: str) -> list[str]:
     chunks = []
-    current = []
-
-    def flush():
-        if current:
-            joined = "\n".join(current).strip()
-            if len(joined) >= MIN_CHUNK_LEN:
-                if len(joined) > MAX_CHUNK_LEN:
-                    joined = joined[:MAX_CHUNK_LEN]
-                chunks.append(joined)
-        return []
-
-    if is_faq:
-        # FAQ-режим: каждая пара Вопрос+Ответ = один чанк
-        for line in lines:
-            if faq_pattern.match(line):
-                current = flush()
-            current.append(line)
-        flush()
-    else:
-        # Обычный режим: короткие строки (заголовки) присоединяем к следующей длинной
-        buffer = []
-        for line in lines:
-            if len(line) < 60 and not line.endswith('.') and not line.endswith(';'):
-                # Вероятно заголовок — сохраняем в буфер
-                if buffer:
-                    buffer = flush()
-                buffer.append(line)
-            else:
-                if buffer:
-                    buffer.append(line)
-                    joined = "\n".join(buffer).strip()
-                    if len(joined) >= MIN_CHUNK_LEN:
-                        if len(joined) > MAX_CHUNK_LEN:
-                            joined = joined[:MAX_CHUNK_LEN]
-                        chunks.append(joined)
-                    buffer = []
-                else:
-                    current.append(line)
-                    if sum(len(c) for c in current) >= MAX_CHUNK_LEN:
-                        current = flush()
-        if buffer:
-            joined = "\n".join(buffer).strip()
-            if len(joined) >= MIN_CHUNK_LEN:
-                if len(joined) > MAX_CHUNK_LEN:
-                    joined = joined[:MAX_CHUNK_LEN]
-                chunks.append(joined)
-        if current:
-            flush()
-
-    return chunks
+    start = 0
+    while start < len(text):
+        chunks.append(text[start:start + CHUNK_SIZE])
+        start += CHUNK_SIZE - CHUNK_OVERLAP
+    return [c for c in chunks if c.strip()]
 
 
 def get_embedding(text: str) -> list[float]:
-    # OpenAI лимит ~8192 токенов ≈ 24000 символов кириллицы
-    if len(text) > 15000:
-        text = text[:15000]
     resp = openai_client.embeddings.create(input=text, model=EMBED_MODEL)
     return resp.data[0].embedding
 
@@ -114,10 +52,9 @@ def main():
 
     print(f"[INFO] Найдено файлов: {len(docx_files)}")
 
-    # Удаляем старую коллекцию
     try:
         chroma_client.delete_collection(COLLECTION)
-        print(f"[OK] Старая коллекция удалена.")
+        print("[OK] Старая коллекция удалена.")
     except Exception:
         pass
 
@@ -136,8 +73,8 @@ def main():
         filepath = os.path.join(DOCS_FOLDER, filename)
         print(f"  Читаю: {filename}")
         text = read_docx(filepath)
-        chunks = split_into_sections(text)
-        print(f"    -> {len(chunks)} логических блоков")
+        chunks = chunk_text(text)
+        print(f"    -> {len(chunks)} чанков")
 
         for chunk in chunks:
             emb = get_embedding(chunk)
@@ -146,7 +83,6 @@ def main():
             all_documents.append(chunk)
             all_metadatas.append({"source": filename})
 
-    # Загружаем пакетами
     batch_size = 100
     for i in range(0, len(all_ids), batch_size):
         collection.add(
@@ -155,10 +91,10 @@ def main():
             documents=all_documents[i:i+batch_size],
             metadatas=all_metadatas[i:i+batch_size],
         )
-        print(f"  [INFO] Загружено {min(i+batch_size, len(all_ids))}/{len(all_ids)} блоков...")
+        print(f"  [INFO] Загружено {min(i+batch_size, len(all_ids))}/{len(all_ids)} чанков...")
 
-    print(f"\n[DONE] Готово! Загружено {len(all_ids)} блоков в ChromaDB.")
-    print("Теперь скопируй папку chroma_db/ в backend/chroma_db/ и redeploy.")
+    print(f"\n[DONE] Готово! Загружено {len(all_ids)} чанков в ChromaDB.")
+    print("Теперь скопируй chroma_db/ в backend/chroma_db/ и redeploy.")
 
 
 if __name__ == "__main__":
