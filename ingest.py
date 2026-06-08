@@ -1,9 +1,10 @@
 """
-ingest.py -- читает .docx файлы из папки docs/ и загружает в ChromaDB (локально)
-Запусти ОДИН РАЗ перед первым использованием чат-бота.
+ingest.py -- читает .docx из docs/ и загружает в ChromaDB.
+Читает параграфы И таблицы. FAQ-документы -- собирает пары Вопрос+Ответ из таблиц.
 """
 
 import os
+import re
 import uuid
 from docx import Document
 from openai import OpenAI
@@ -25,21 +26,61 @@ openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 chroma_client = chromadb.PersistentClient(path=CHROMA_FOLDER)
 
 
-def read_docx(path: str) -> str:
+def read_docx_paragraphs(path: str) -> str:
+    """Читает только параграфы (стандартный текст)."""
     doc = Document(path)
     return "\n".join(p.text for p in doc.paragraphs if p.text.strip())
 
 
+def read_docx_tables(path: str) -> list[str]:
+    """Читает таблицы и возвращает список строк (каждая строка = один чанк)."""
+    doc = Document(path)
+    rows = []
+    for table in doc.tables:
+        # Проверяем заголовки первой строки
+        if not table.rows:
+            continue
+        header_cells = [c.text.strip().lower() for c in table.rows[0].cells]
+
+        # Определяем структуру по заголовкам
+        has_question = any('вопрос' in h or 'вопросы' in h for h in header_cells)
+        has_answer   = any('ответ' in h or 'ответы' in h for h in header_cells)
+        has_solution = any('решение' in h or 'способ решения' in h for h in header_cells)
+
+        if has_question and (has_answer or has_solution):
+            # FAQ-таблица: собираем пары Вопрос+Ответ
+            for row in table.rows[1:]:
+                cells = [c.text.strip() for c in row.cells]
+                if len(cells) >= 3:
+                    q_text = cells[1]  # колонка Вопрос
+                    a_text = cells[2]  # колонка Ответ/Решение
+                    if q_text and a_text:
+                        rows.append(f"Вопрос: {q_text}\nОтвет: {a_text}")
+        else:
+            # Обычная таблица: каждая строка = один чанк
+            for row in table.rows:
+                cells = [c.text.strip() for c in row.cells if c.text.strip()]
+                if cells:
+                    rows.append(" | ".join(cells))
+    return rows
+
+
 def chunk_text(text: str) -> list[str]:
+    """Механическое разбиение по 500 символов."""
     chunks = []
     start = 0
     while start < len(text):
-        chunks.append(text[start:start + CHUNK_SIZE])
+        end = start + CHUNK_SIZE
+        chunk = text[start:end].strip()
+        if chunk:
+            chunks.append(chunk)
         start += CHUNK_SIZE - CHUNK_OVERLAP
-    return [c for c in chunks if c.strip()]
+    return [c for c in chunks if c]
 
 
 def get_embedding(text: str) -> list[float]:
+    if len(text) > 20000:
+        text = text[:20000]
     resp = openai_client.embeddings.create(input=text, model=EMBED_MODEL)
     return resp.data[0].embedding
 
@@ -72,9 +113,21 @@ def main():
     for filename in docx_files:
         filepath = os.path.join(DOCS_FOLDER, filename)
         print(f"  Читаю: {filename}")
-        text = read_docx(filepath)
-        chunks = chunk_text(text)
-        print(f"    -> {len(chunks)} чанков")
+
+        chunks = []
+
+        # 1. Параграфы
+        para_text = read_docx_paragraphs(filepath)
+        if para_text:
+            chunks.extend(chunk_text(para_text))
+
+        # 2. Таблицы (FAQ)
+        table_rows = read_docx_tables(filepath)
+        if table_rows:
+            print(f"    -> {len(table_rows)} строк из таблиц (FAQ)")
+            chunks.extend(table_rows)
+
+        print(f"    -> Всего {len(chunks)} блоков")
 
         for chunk in chunks:
             emb = get_embedding(chunk)
@@ -91,10 +144,10 @@ def main():
             documents=all_documents[i:i+batch_size],
             metadatas=all_metadatas[i:i+batch_size],
         )
-        print(f"  [INFO] Загружено {min(i+batch_size, len(all_ids))}/{len(all_ids)} чанков...")
+        print(f"  [INFO] Загружено {min(i+batch_size, len(all_ids))}/{len(all_ids)}...")
 
-    print(f"\n[DONE] Готово! Загружено {len(all_ids)} чанков в ChromaDB.")
-    print("Теперь скопируй chroma_db/ в backend/chroma_db/ и redeploy.")
+    print(f"\n[DONE] Готово! Загружено {len(all_ids)} блоков в ChromaDB.")
+    print("Скопируй chroma_db/ в backend/chroma_db/ и redeploy.")
 
 
 if __name__ == "__main__":
