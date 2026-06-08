@@ -18,7 +18,7 @@ DOCS_FOLDER   = "./docs"
 COLLECTION    = "callcenter-docs"
 CHROMA_FOLDER = "./chroma_db"
 EMBED_MODEL   = "text-embedding-3-small"
-MAX_CHUNK_LEN = 700    # максимум символов в одном чанке
+MAX_CHUNK_LEN = 1200   # максимум символов в одном чанке
 MIN_CHUNK_LEN = 30     # минимум — иначе пропускаем
 # ─────────────────────────────────────────────────────────────────────────────
 
