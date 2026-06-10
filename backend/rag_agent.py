@@ -1,9 +1,8 @@
 """
-rag_agent.py -- RAG агент для колл-центра (ChromaDB локально)
+rag_agent.py — RAG агент для колл-центра (ChromaDB локально)
 """
 
 import os
-import re
 from openai import OpenAI
 from groq import Groq
 import chromadb
@@ -16,9 +15,8 @@ COLLECTION    = "callcenter-docs"
 CHROMA_FOLDER = "./chroma_db"
 EMBED_MODEL   = "text-embedding-3-small"
 LLM_MODEL     = "llama-3.3-70b-versatile"
-TOP_K         = 4
-MAX_HISTORY   = 2
-MAX_CONTEXT   = 3800
+TOP_K         = 10
+MAX_HISTORY   = 10
 # ─────────────────────────────────────────────────────────────────────────────
 
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -26,22 +24,22 @@ groq_client   = Groq(api_key=os.getenv("GROQ_API_KEY"))
 chroma_client = chromadb.PersistentClient(path=CHROMA_FOLDER)
 collection    = chroma_client.get_collection(name=COLLECTION)
 
-SYSTEM_PROMPT = """Ты -- ассистент НПК (Национальная Корпорация Платежей). Твоя задача -- помогать операторам колл-центра отвечать на вопросы клиентов ТОЛЬКО на основе контекста ниже.
+SYSTEM_PROMPT = """Ты — интеллектуальный ассистент колл-центра НПК. Твоя задача — отвечать на вопросы операторов, используя ТОЛЬКО предоставленный ниже контекст из базы знаний.
 
-КРИТИЧЕСКИ ВАЖНЫЕ ПРАВИЛА:
-1. Отвечай ТОЛЬКО на основе предоставленного контекста. Не выдумывай ничего.
-2. Если контекст однозначно и полностью отвечает на вопрос -- дай прямой ответ.
-3. Если контекст содержит несколько разных вариантов ответа (например, про разные системы: ФАСТИ, ЦОИД, СМП и т.д.), а вопрос клиента НЕ уточняет какой именно вариант нужен -- задай ОДИН уточняющий вопрос. НЕ давай общий ответ смешивая разные системы.
-4. Если контекст совсем не подходит -- скажи: "К сожалению, по этому вопросу информации в базе нет. Уточните у супервайзера."
+ВАЖНЫЕ ПРАВИЛА:
+1. Всегда анализируй контекст ниже — в нём есть ответы на вопросы.
+2. Если в контексте есть таблица или список — перечисли данные из неё. Не говори "информации нет", если в контексте есть строки/ячейки/пункты по теме.
+3. Если контекст по теме найден, но неполный — дай то, что есть, и уточни что именно нужно дополнить.
+4. Если контекст совсем пуст (написано "Информация не найдена") — ТОЛЬКО тогда скажи: "К сожалению, по этому вопросу информации в базе нет. Уточните у супервайзера."
+5. Ты — виртуальный ИИ-помощник, НЕ живой оператор. НЕ называй своё имя, НЕ представляйся человеком и НЕ используй конструкции вроде "меня зовут...".
 
-ПРИМЕРЫ:
-- Вопрос: "как подключиться к биометрии" (без уточнения системы) + контекст про биометрию ФАСТИ3 и ЦОИД → задай уточняющий вопрос: "К какой системе вы хотите подключить биометрию — ФАСТИ3 или ЦОИД?"
-- Вопрос: "как подключиться к вашим системам" (очень общий) → задай уточняющий вопрос: "К какой именно системе вы хотите подключиться? У нас есть ФАСТИ, ЦОИД, СМП, МСПД и другие."
-- Вопрос: "как подключиться к ФАСТИ" (конкретный) + контекст про ФАСТИ → дай прямой ответ по контексту.
-- Вопрос: "как подключиться к ЦОИД" (конкретный) + контекст про ЦОИД → дай прямой ответ по контексту.
-- Вопрос: "что такое ЦОИД" + контекст про ЦОИД → дай прямой ответ по контексту.
+ФОРМАТ ОТВЕТА:
+- Отвечай чётко и по делу, без лишних вступлений
+- Если есть шаги или список участников/тарифов/услуг — перечисли их
+- Если контекст содержит таблицу — перенеси данные из неё в понятный текст
+- Тон: вежливый, профессиональный
 
-КОНТЕКСТ:
+КОНТЕКСТ ИЗ БАЗЫ ЗНАНИЙ:
 {context}"""
 
 
@@ -50,80 +48,18 @@ def get_embedding(text: str) -> list[float]:
     return resp.data[0].embedding
 
 
-def _extract_keywords(text: str) -> list[str]:
-    """Извлекает значимые ключевые слова из запроса."""
-    stop = {"как", "что", "где", "когда", "кто", "почему", "зачем",
-            "из", "в", "на", "по", "для", "с", "у", "о", "об",
-            "или", "и", "а", "но", "если", "так", "же", "ли", "не",
-            "это", "тот", "такой", "который", "быть", "есть", "иметь",
-            "между", "при", "до", "после", "от", "до", "про", "со"}
-    words = re.findall(r'[а-яА-ЯёЁa-zA-Z]+', text.lower())
-    return [w for w in words if w not in stop and len(w) > 2]
-
-
-def _keyword_search(keywords: list[str], limit: int = 3) -> str:
-    """Поиск по ключевым словам через полный перебор всех документов."""
-    if not keywords:
-        return ""
-    try:
-        all_data = collection.get(include=["documents", "metadatas"])
-        docs = all_data.get("documents", [])
-        metas = all_data.get("metadatas", [])
-        if not docs:
-            return ""
-
-        scored = []
-        for doc, meta in zip(docs, metas):
-            doc_lower = doc.lower()
-            # Считаем совпадения ключевых слов
-            score = sum(3 for kw in keywords if kw in doc_lower)
-            # Бонус за точное совпадение фразы
-            for i in range(len(keywords) - 1):
-                bigram = f"{keywords[i]} {keywords[i+1]}"
-                if bigram in doc_lower:
-                    score += 5
-            if score > 0:
-                scored.append((score, doc, meta))
-
-        scored.sort(reverse=True, key=lambda x: x[0])
-        parts = []
-        for i, (score, doc, meta) in enumerate(scored[:limit], 1):
-            source = meta.get("source", "")
-            parts.append(f"[K{i}] {source}\n{doc}")
-        return "\n\n---\n\n".join(parts)
-    except Exception:
-        return ""
-
-
 def search(query: str) -> str:
-    """Embedding search + keyword fallback."""
-    # 1. Эмбеддинг-поиск
     emb = get_embedding(query)
     results = collection.query(
         query_embeddings=[emb],
         n_results=TOP_K,
-        include=["documents", "metadatas", "distances"],
+        include=["documents", "metadatas"],
     )
-
-    docs = results["documents"][0]
-    metas = results["metadatas"][0]
-    distances = results.get("distances", [[]])[0]
-
     parts = []
-    best_distance = min(distances) if distances else 999
-
-    for i, (doc, meta) in enumerate(zip(docs, metas), 1):
+    for i, (doc, meta) in enumerate(zip(results["documents"][0], results["metadatas"][0]), 1):
         source = meta.get("source", "")
-        parts.append(f"[{i}] {source}\n{doc}")
-
-    # 2. Если embedding дал плохие результаты (дистанция > 0.35) -- добавляем keyword search
-    if best_distance > 0.35:
-        keywords = _extract_keywords(query)
-        kw_results = _keyword_search(keywords, limit=3)
-        if kw_results:
-            parts.append("\n\n[Дополнительно по ключевым словам]\n" + kw_results)
-
-    return "\n\n---\n\n".join(parts) if parts else ""
+        parts.append(f"[{i}] Источник: {source}\n{doc}")
+    return "\n\n---\n\n".join(parts) if parts else "Информация не найдена в базе знаний."
 
 
 class RAGAgent:
@@ -131,21 +67,16 @@ class RAGAgent:
         self.history: list[dict] = []
 
     def chat(self, user_message: str) -> str:
+        # Если вопрос короткий — добавляем контекст из предыдущего ответа
         search_query = user_message
-        # Используем историю только для коротких уточняющих вопросов
-        if len(user_message.split()) <= 4 and self.history:
-            last_user = next(
-                (m["content"] for m in reversed(self.history) if m["role"] == "user"), ""
-            )
+        if len(user_message.split()) <= 5 and self.history:
             last_bot = next(
-                (m["content"] for m in reversed(self.history) if m["role"] == "assistant"), ""
+                (m["content"] for m in reversed(self.history) if m["role"] == "assistant"),
+                ""
             )
-            search_query = f"{last_user} {last_bot[:150]} {user_message}"
+            search_query = f"{last_bot[:300]} {user_message}"
 
         context = search(search_query)
-        if len(context) > MAX_CONTEXT:
-            context = context[:MAX_CONTEXT] + "\n[...]"
-
         system = {"role": "system", "content": SYSTEM_PROMPT.format(context=context)}
         self.history.append({"role": "user", "content": user_message})
         messages = [system] + self.history[-MAX_HISTORY:]
@@ -153,8 +84,8 @@ class RAGAgent:
         resp = groq_client.chat.completions.create(
             model=LLM_MODEL,
             messages=messages,
-            temperature=0.1,
-            max_tokens=1024,
+            temperature=0.2,
+            max_tokens=2048,
         )
         answer = resp.choices[0].message.content
         self.history.append({"role": "assistant", "content": answer})
