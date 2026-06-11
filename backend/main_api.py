@@ -47,7 +47,11 @@ def chat(req: ChatRequest):
     try:
         answer = agent.chat(req.message)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        err_detail = str(e)
+        # Если лимит и Groq, и OpenAI исчерпан — возвращаем 429
+        if "429" in err_detail or "rate_limit" in err_detail.lower() or "quota" in err_detail.lower():
+            raise HTTPException(status_code=429, detail="Лимит API исчерпан. Попробуйте через несколько минут.")
+        raise HTTPException(status_code=500, detail=err_detail)
 
     return ChatResponse(answer=answer)
 

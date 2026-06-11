@@ -79,6 +79,8 @@ export function ChatWidget() {
           content = 'Сервер долго не отвечает (возможно, просыпается после простоя). Попробуйте ещё раз через 30 секунд.'
         } else if (err.response?.status === 502 || err.response?.status === 503) {
           content = 'Сервис временно недоступен. Попробуйте через минуту.'
+        } else if (err.response?.status === 429) {
+          content = 'Лимит запросов к ИИ исчерпан. Попробуйте через несколько минут.'
         } else if (err.response?.status === 500) {
           content = 'Ошибка на сервере при обработке запроса. Попробуйте позже.'
         } else if (!err.response) {

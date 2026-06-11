@@ -184,13 +184,29 @@ class RAGAgent:
         self.history.append({"role": "user", "content": user_message})
         messages = [system] + self.history[-MAX_HISTORY:]
 
-        resp = groq_client.chat.completions.create(
-            model=LLM_MODEL,
-            messages=messages,
-            temperature=0.2,
-            max_tokens=2048,
-        )
-        answer = resp.choices[0].message.content
+        # Сначала пробуем Groq, если лимит исчерпан — fallback на OpenAI
+        try:
+            resp = groq_client.chat.completions.create(
+                model=LLM_MODEL,
+                messages=messages,
+                temperature=0.2,
+                max_tokens=2048,
+            )
+            answer = resp.choices[0].message.content
+        except Exception as e:
+            err_str = str(e)
+            if "429" in err_str or "rate_limit" in err_str.lower():
+                # Fallback на OpenAI gpt-4o-mini
+                resp = openai_client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=messages,
+                    temperature=0.2,
+                    max_tokens=2048,
+                )
+                answer = resp.choices[0].message.content
+            else:
+                raise
+
         answer = sanitize_answer(answer)
         self.history.append({"role": "assistant", "content": answer})
         return answer
