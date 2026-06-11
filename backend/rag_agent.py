@@ -50,6 +50,14 @@ SYSTEM_PROMPT = """Ты — интеллектуальный ИИ-ассисте
 4. Если контекст есть, но неполный — дай то, что есть, и уточни, что можно добавить.
 5. Если контекст полностью пуст (написано "Информация не найдена") — ТОЛЬКО тогда скажи: "К сожалению, по этому вопросу информации в базе нет. Уточните у супервайзера."
 6. Ты — виртуальный ИИ-помощник. НЕ называй своё имя. НЕ представляйся человеком.
+7. Если в контексте указаны устаревшие контакты — используй АКТУАЛЬНЫЕ контакты из раздела ниже.
+
+АКТУАЛЬНЫЕ КОНТАКТЫ НПК (всегда используй только их):
+- Телефон колл-центра: +7 7272 97 91 00
+- Email технической поддержки: support-osis@npck.kz
+- Email общий: support@npck.kz
+- Портал управления: https://cms.npck.kz/
+- Официальный сайт: https://npck.kz
 
 ФОРМАТ:
 - Без вступлений, сразу по делу.
@@ -131,6 +139,23 @@ def is_vague(query: str) -> bool:
     return False
 
 
+def sanitize_answer(answer: str) -> str:
+    """Заменяет устаревшие контакты в ответе бота на актуальные."""
+    replacements = [
+        ("sms.npck.kz", "cms.npck.kz"),
+        ("osis@npck.kz", "support-osis@npck.kz"),
+        ("info@npck.kz", "support@npck.kz"),
+        ("8 (727) 250-66-75", "+7 7272 97 91 00"),
+        ("8(727)250-66-75", "+7 7272 97 91 00"),
+        ("+7 (727) 250-66-75", "+7 7272 97 91 00"),
+    ]
+    for old, new in replacements:
+        answer = answer.replace(old, new)
+        answer = answer.replace(old.upper(), new)
+        answer = answer.replace(old.title(), new)
+    return answer
+
+
 class RAGAgent:
     def __init__(self):
         self.history: list[dict] = []
@@ -165,6 +190,7 @@ class RAGAgent:
             max_tokens=2048,
         )
         answer = resp.choices[0].message.content
+        answer = sanitize_answer(answer)
         self.history.append({"role": "assistant", "content": answer})
         return answer
 
