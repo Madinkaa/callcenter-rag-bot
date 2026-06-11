@@ -5,7 +5,7 @@ const BASE = (import.meta.env?.VITE_API_BASE as string | undefined) || 'http://l
 export const api = axios.create({
   baseURL: BASE,
   headers: { 'Content-Type': 'application/json' },
-  timeout: 30000,
+  timeout: 60000,
 })
 
 export interface ChatRequest {

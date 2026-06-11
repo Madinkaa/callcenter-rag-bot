@@ -1,6 +1,6 @@
-import { Sparkles, Phone } from 'lucide-react'
+import { Sparkles, FileText, Phone } from 'lucide-react'
 
-export type TabKey = 'home' | 'contacts'
+export type TabKey = 'home' | 'appeal' | 'contacts'
 
 interface Props {
   active: TabKey
@@ -9,8 +9,9 @@ interface Props {
 
 export function Tabs({ active, onChange }: Props) {
   const items = [
-    { key: 'home' as TabKey, label: 'Главная', icon: <Sparkles size={18} /> },
-    { key: 'contacts' as TabKey, label: 'Контакты', icon: <Phone size={18} /> },
+    { key: 'home' as TabKey, label: 'Главная', icon: <Sparkles size={16} /> },
+    { key: 'appeal' as TabKey, label: 'Создать обращение', icon: <FileText size={16} /> },
+    { key: 'contacts' as TabKey, label: 'Связаться с нами', icon: <Phone size={16} /> },
   ]
 
   return (

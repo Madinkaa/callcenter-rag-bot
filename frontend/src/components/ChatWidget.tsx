@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { MessageSquare } from 'lucide-react'
+import axios from 'axios'
 import { Header } from './Header'
 import { Bubble, TypingBubble } from './Bubble'
 import { InputBar } from './InputBar'
 import { Tabs, TabKey } from './Tabs'
 import { ContactsTab } from './ContactsTab'
+import { AppealTab } from './AppealTab'
 import { sendMessage, resetSession } from '../api/client'
 
 interface Msg {
@@ -70,11 +72,23 @@ export function ChatWidget() {
       const finalMessages = [...nextMessages, aiMsg]
       setMessages(finalMessages)
       saveSession(sessionId, finalMessages)
-    } catch {
+    } catch (err: any) {
+      let content = 'Не удалось связаться с сервером. Попробуйте позже.'
+      if (axios.isAxiosError(err)) {
+        if (err.code === 'ECONNABORTED' || err.code === 'ETIMEDOUT') {
+          content = 'Сервер долго не отвечает (возможно, просыпается после простоя). Попробуйте ещё раз через 30 секунд.'
+        } else if (err.response?.status === 502 || err.response?.status === 503) {
+          content = 'Сервис временно недоступен. Попробуйте через минуту.'
+        } else if (err.response?.status === 500) {
+          content = 'Ошибка на сервере при обработке запроса. Попробуйте позже.'
+        } else if (!err.response) {
+          content = 'Нет соединения с сервером. Проверьте интернет или попробуйте позже.'
+        }
+      }
       const errMsg: Msg = {
         id: crypto.randomUUID(),
         sender: 'ai',
-        content: 'Сервис временно недоступен. Попробуйте через минуту.',
+        content,
         ts: Date.now(),
       }
       const finalMessages = [...nextMessages, errMsg]
@@ -94,8 +108,15 @@ export function ChatWidget() {
     saveSession(id, [])
   }
 
-  const headerTitle = tab === 'home' ? 'ИИ-помощник НПК' : 'Контакты НПК'
-  const headerStatus = tab === 'home' ? 'Онлайн' : 'Колл-центр'
+  const headerTitle =
+    tab === 'home' ? 'ИИ-помощник НПК' :
+    tab === 'appeal' ? 'Подать обращение' :
+    'Контакты НПК'
+
+  const headerStatus =
+    tab === 'home' ? 'Онлайн' :
+    tab === 'appeal' ? 'Служба поддержки' :
+    'Колл-центр'
 
   if (!open) {
     return (
@@ -116,7 +137,7 @@ export function ChatWidget() {
           onClose={() => setOpen(false)}
           onReset={tab === 'home' ? handleReset : undefined}
         />
-        {tab === 'home' ? (
+        {tab === 'home' && (
           <>
             <div className="body" ref={bodyRef}>
               {messages.length === 0 && (
@@ -132,9 +153,9 @@ export function ChatWidget() {
             </div>
             <InputBar onSubmit={handleSend} disabled={thinking} />
           </>
-        ) : (
-          <ContactsTab />
         )}
+        {tab === 'appeal' && <AppealTab />}
+        {tab === 'contacts' && <ContactsTab />}
         <Tabs active={tab} onChange={setTab} />
       </div>
     </div>
