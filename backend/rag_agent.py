@@ -54,8 +54,7 @@ SYSTEM_PROMPT = """Ты — интеллектуальный ИИ-ассисте
 
 АКТУАЛЬНЫЕ КОНТАКТЫ НПК (всегда используй только их):
 - Телефон колл-центра: +7 7272 97 91 00
-- Email технической поддержки: support-osis@npck.kz
-- Email общий: support@npck.kz
+- Email: support@npck.kz
 - Портал управления: https://cms.npck.kz/
 - Официальный сайт: https://npck.kz
 
@@ -142,9 +141,14 @@ def is_vague(query: str) -> bool:
 def sanitize_answer(answer: str) -> str:
     """Заменяет устаревшие контакты в ответе бота на актуальные."""
     replacements = [
+        # URL
         ("sms.npck.kz", "cms.npck.kz"),
-        ("osis@npck.kz", "support-osis@npck.kz"),
+        # Email: любые osis-варианты → единый support@npck.kz
+        ("support-support-osis@npck.kz", "support@npck.kz"),
+        ("support-osis@npck.kz", "support@npck.kz"),
+        ("osis@npck.kz", "support@npck.kz"),
         ("info@npck.kz", "support@npck.kz"),
+        # Phone
         ("8 (727) 250-66-75", "+7 7272 97 91 00"),
         ("8(727)250-66-75", "+7 7272 97 91 00"),
         ("+7 (727) 250-66-75", "+7 7272 97 91 00"),
