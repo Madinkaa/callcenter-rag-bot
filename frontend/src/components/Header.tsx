@@ -10,7 +10,7 @@ interface Props {
 export function Header({ title, status, onClose, onReset }: Props) {
   return (
     <div className="header">
-      <div className="avatar">Н</div>
+      <img src="/npck-logo.png" className="header-logo" alt="НПК" />
       <div className="header-grow">
         <div className="title">{title}</div>
         <div className="sub">

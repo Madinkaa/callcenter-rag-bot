@@ -104,18 +104,13 @@ input, textarea { font-family: inherit; }
   color: #fff;
   flex-shrink: 0;
 }
-.header .avatar {
+.header-logo {
   width: 36px;
   height: 36px;
   border-radius: 10px;
   background: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 14px;
-  color: var(--primary);
-  overflow: hidden;
+  object-fit: contain;
+  padding: 3px;
   flex-shrink: 0;
 }
 .header .title { font-size: 14px; font-weight: 600; }
