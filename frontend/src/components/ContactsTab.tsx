@@ -6,7 +6,6 @@ import {
   Linkedin,
   Send,
   MapPin,
-  ExternalLink,
 } from 'lucide-react'
 
 export function ContactsTab() {
@@ -53,6 +52,7 @@ export function ContactsTab() {
       {/* Телефон */}
       <div className="contacts-phone-card">
         <div className="phone-ring">
+          <div className="phone-wave" />
           <div className="phone-ring-inner">
             <Phone size={24} />
           </div>
@@ -85,22 +85,19 @@ export function ContactsTab() {
       {/* Соцсети */}
       <div className="contacts-socials">
         <div className="socials-title">Мы в социальных сетях</div>
-        <div className="socials-grid">
+        <div className="socials-row">
           {socials.map((s) => (
             <a
               key={s.label}
               href={s.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="social-card"
+              className="social-chip"
+              title={`${s.label}: ${s.value}`}
               style={{ '--social-color': s.color } as React.CSSProperties}
             >
-              <div className="social-icon">{s.icon}</div>
-              <div className="social-info">
-                <div className="social-label">{s.label}</div>
-                <div className="social-value">{s.value}</div>
-              </div>
-              <ExternalLink size={14} className="social-arrow" />
+              <span className="social-chip-icon">{s.icon}</span>
+              <span className="social-chip-label">{s.label}</span>
             </a>
           ))}
         </div>

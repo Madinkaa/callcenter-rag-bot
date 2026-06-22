@@ -17,13 +17,19 @@ load_dotenv()
 DOCS_FOLDER   = "./docs"
 COLLECTION    = "callcenter-docs"
 CHROMA_FOLDER = "./chroma_db"
-CHUNK_SIZE    = 500
-CHUNK_OVERLAP = 100
+CHUNK_SIZE    = 1000
+CHUNK_OVERLAP = 200
 EMBED_MODEL   = "text-embedding-3-small"
 # ─────────────────────────────────────────────────────────────────────────────
 
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 chroma_client = chromadb.PersistentClient(path=CHROMA_FOLDER)
+
+
+def read_txt_file(path: str) -> str:
+    """Читает текстовый файл (.txt / .md)."""
+    with open(path, "r", encoding="utf-8") as f:
+        return f.read()
 
 
 def read_docx_paragraphs(path: str) -> str:
@@ -87,11 +93,13 @@ def get_embedding(text: str) -> list[float]:
 
 def main():
     docx_files = [f for f in os.listdir(DOCS_FOLDER) if f.endswith(".docx") and not f.startswith("~")]
+    txt_files  = [f for f in os.listdir(DOCS_FOLDER) if f.endswith((".txt", ".md"))]
     if not docx_files:
         print("[!] Нет .docx файлов в папке docs/")
         return
 
-    print(f"[INFO] Найдено файлов: {len(docx_files)}")
+    all_files = docx_files + txt_files
+    print(f"[INFO] Найдено файлов: {len(all_files)} (docx: {len(docx_files)}, txt/md: {len(txt_files)})")
 
     try:
         chroma_client.delete_collection(COLLECTION)
@@ -110,22 +118,27 @@ def main():
     all_documents = []
     all_metadatas = []
 
-    for filename in docx_files:
+    for filename in all_files:
         filepath = os.path.join(DOCS_FOLDER, filename)
         print(f"  Читаю: {filename}")
 
         chunks = []
 
-        # 1. Параграфы
-        para_text = read_docx_paragraphs(filepath)
-        if para_text:
-            chunks.extend(chunk_text(para_text))
+        if filename.endswith((".txt", ".md")):
+            text = read_txt_file(filepath)
+            if text:
+                chunks.extend(chunk_text(text))
+        else:
+            # 1. Параграфы
+            para_text = read_docx_paragraphs(filepath)
+            if para_text:
+                chunks.extend(chunk_text(para_text))
 
-        # 2. Таблицы (FAQ)
-        table_rows = read_docx_tables(filepath)
-        if table_rows:
-            print(f"    -> {len(table_rows)} строк из таблиц (FAQ)")
-            chunks.extend(table_rows)
+            # 2. Таблицы (FAQ)
+            table_rows = read_docx_tables(filepath)
+            if table_rows:
+                print(f"    -> {len(table_rows)} строк из таблиц (FAQ)")
+                chunks.extend(table_rows)
 
         print(f"    -> Всего {len(chunks)} блоков")
 
