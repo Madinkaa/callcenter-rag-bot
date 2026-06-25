@@ -73,12 +73,8 @@ export function ContactsTab() {
           <span>Время работы</span>
         </div>
         <div className="schedule-row">
-          <span className="day">Пн – Пт</span>
-          <span className="time">07:00 – 20:00</span>
-        </div>
-        <div className="schedule-row">
-          <span className="day">Сб – Вс</span>
-          <span className="time off">Выходной</span>
+          <span className="day">Рабочие дни</span>
+          <span className="time">с 07:00 до 20:00</span>
         </div>
       </div>
 
