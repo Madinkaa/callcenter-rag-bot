@@ -58,7 +58,7 @@ export function AppealTab() {
                 <span>support@npck.kz</span>
               </div>
               <a
-                href="/Шаблон.docx"
+                href="/Шаблон.docx?v=2"
                 download="Шаблон_заявления_НПК.docx"
                 className="appeal-option-btn btn-green"
               >
