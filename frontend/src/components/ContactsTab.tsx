@@ -74,7 +74,7 @@ export function ContactsTab() {
         </div>
         <div className="schedule-row">
           <span className="day">Пн – Пт</span>
-          <span className="time">8:40 – 17:40</span>
+          <span className="time">07:00 – 20:00</span>
         </div>
         <div className="schedule-row">
           <span className="day">Сб – Вс</span>

@@ -47,7 +47,7 @@ export function AppealTab() {
                 <div className="appeal-option-icon new">
                   <UserPlus size={18} />
                 </div>
-                <div className="appeal-option-label">Новый клиент</div>
+                <div className="appeal-option-label">Стать клиентом</div>
               </div>
               <p className="appeal-option-desc">
                 Нет личного кабинета? Скачайте шаблон заявления.
@@ -73,7 +73,7 @@ export function AppealTab() {
                 <div className="appeal-option-icon existing">
                   <LogIn size={18} />
                 </div>
-                <div className="appeal-option-label">Уже клиент</div>
+                <div className="appeal-option-label">Являюсь клиентом</div>
               </div>
               <p className="appeal-option-desc">
                 Есть доступ к личному кабинету? Подайте заявку онлайн.
