@@ -76,6 +76,10 @@ export function ContactsTab() {
           <span className="day">Рабочие дни</span>
           <span className="time">с 07:00 до 20:00</span>
         </div>
+        <div className="schedule-row">
+          <span className="day">Выходные</span>
+          <span className="time off">Выходной</span>
+        </div>
       </div>
 
       {/* Соцсети */}
