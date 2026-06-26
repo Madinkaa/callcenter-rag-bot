@@ -1,10 +1,9 @@
 import {
   Download,
   Globe,
-  ArrowRight,
   LogIn,
   ExternalLink,
-  FileText,
+  UserPlus,
   Phone,
 } from 'lucide-react'
 
@@ -17,40 +16,38 @@ export function AppealTab() {
         <div className="appeal-step-body">
           <div className="appeal-step-title">Стать клиентом</div>
 
-          <a
-            href="https://npck.kz/kak-stat-klientom-2/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="appeal-link-card appeal-link-card--accent"
-          >
-            <div className="appeal-link-icon">
-              <ExternalLink size={20} />
-            </div>
-            <div className="appeal-link-text">
-              <div className="appeal-link-title">Инструкция по подключению</div>
-              <div className="appeal-link-sub">На официальном сайте npck.kz</div>
-            </div>
-            <ArrowRight size={18} className="appeal-link-arrow" />
-          </a>
-
-          <div className="appeal-mini-card">
-            <div className="appeal-mini-info">
-              <div className="appeal-mini-icon">
-                <FileText size={16} />
+          <div className="appeal-option-card">
+            <div className="appeal-option-header">
+              <div className="appeal-option-icon new">
+                <UserPlus size={18} />
               </div>
-              <div className="appeal-mini-text">
-                <div className="appeal-mini-title">Шаблон заявления</div>
-                <div className="appeal-mini-sub">.docx для новых клиентов</div>
-              </div>
+              <div className="appeal-option-label">Новый клиент</div>
             </div>
-            <a
-              href="/Шаблон.docx?v=2"
-              download="Шаблон_заявления_НПК.docx"
-              className="appeal-mini-btn"
-            >
-              <Download size={14} />
-              Скачать
-            </a>
+            <p className="appeal-option-desc">
+              Нет личного кабинета? Ознакомьтесь с инструкцией по подключению и скачайте шаблон заявления.
+            </p>
+            <div className="appeal-option-meta">
+              <span>support@npck.kz</span>
+            </div>
+            <div className="appeal-option-actions">
+              <a
+                href="https://npck.kz/kak-stat-klientom-2/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="appeal-option-btn btn-green"
+              >
+                <ExternalLink size={14} />
+                Инструкция
+              </a>
+              <a
+                href="/Шаблон.docx?v=2"
+                download="Шаблон_заявления_НПК.docx"
+                className="appeal-option-btn btn-green-outline"
+              >
+                <Download size={14} />
+                Шаблон
+              </a>
+            </div>
           </div>
         </div>
       </div>
