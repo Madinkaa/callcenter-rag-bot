@@ -1,5 +1,6 @@
 import { Send } from 'lucide-react'
 import { FormEvent, useState } from 'react'
+import { useTranslation } from '../i18n/useTranslation'
 
 interface Props {
   disabled?: boolean
@@ -8,6 +9,7 @@ interface Props {
 
 export function InputBar({ disabled, onSubmit }: Props) {
   const [value, setValue] = useState('')
+  const { t } = useTranslation()
 
   const submit = (e: FormEvent) => {
     e.preventDefault()
@@ -23,10 +25,10 @@ export function InputBar({ disabled, onSubmit }: Props) {
         className="field"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder="Введите сообщение..."
+        placeholder={t('input.placeholder')}
         disabled={disabled}
       />
-      <button className="send" type="submit" disabled={disabled || !value.trim()} aria-label="Отправить">
+      <button className="send" type="submit" disabled={disabled || !value.trim()} aria-label={t('input.send')}>
         <Send size={16} />
       </button>
     </form>

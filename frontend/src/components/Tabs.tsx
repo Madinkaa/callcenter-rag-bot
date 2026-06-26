@@ -1,4 +1,5 @@
 import { Sparkles, FileText, Phone } from 'lucide-react'
+import { useTranslation } from '../i18n/useTranslation'
 
 export type TabKey = 'home' | 'appeal' | 'contacts'
 
@@ -8,10 +9,12 @@ interface Props {
 }
 
 export function Tabs({ active, onChange }: Props) {
+  const { t } = useTranslation()
+
   const items = [
-    { key: 'home' as TabKey, label: 'Главная', icon: <Sparkles size={16} /> },
-    { key: 'appeal' as TabKey, label: 'Подать обращение', icon: <FileText size={16} /> },
-    { key: 'contacts' as TabKey, label: 'Контакты', icon: <Phone size={16} /> },
+    { key: 'home' as TabKey, label: t('tab.home'), icon: <Sparkles size={16} /> },
+    { key: 'appeal' as TabKey, label: t('tab.appeal'), icon: <FileText size={16} /> },
+    { key: 'contacts' as TabKey, label: t('tab.contacts'), icon: <Phone size={16} /> },
   ]
 
   return (

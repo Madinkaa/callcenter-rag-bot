@@ -7,8 +7,11 @@ import {
   Send,
   MapPin,
 } from 'lucide-react'
+import { useTranslation } from '../i18n/useTranslation'
 
 export function ContactsTab() {
+  const { t } = useTranslation()
+
   const socials = [
     {
       icon: <Mail size={18} />,
@@ -45,7 +48,7 @@ export function ContactsTab() {
       {/* Заголовок */}
       <div className="contacts-hero">
         <img className="contacts-avatar" src="/npck-avatar.png" alt="НПК" />
-        <p>Мы всегда на связи и готовы помочь</p>
+        <p>{t('contacts.heroText')}</p>
       </div>
 
       {/* Телефон */}
@@ -56,12 +59,12 @@ export function ContactsTab() {
             <Phone size={24} />
           </div>
         </div>
-        <div className="phone-badge">Телефон колл-центра</div>
+        <div className="phone-badge">{t('contacts.phoneBadge')}</div>
         <div className="phone-number">+7 727 297 91 00</div>
         <div className="phone-divider" />
-        <div className="phone-sub">Звонок по тарифам вашего оператора</div>
+        <div className="phone-sub">{t('contacts.phoneSub')}</div>
         <a href="tel:+77272979100" className="phone-call-btn">
-          <Phone size={16} /> Позвонить сейчас
+          <Phone size={16} /> {t('contacts.callNow')}
         </a>
       </div>
 
@@ -69,21 +72,21 @@ export function ContactsTab() {
       <div className="contacts-schedule">
         <div className="schedule-title">
           <Timer size={14} />
-          <span>Время работы</span>
+          <span>{t('contacts.scheduleTitle')}</span>
         </div>
         <div className="schedule-row">
-          <span className="day">Пн – Пт</span>
-          <span className="time">с 07:00 до 20:00</span>
+          <span className="day">{t('contacts.dayWeek')}</span>
+          <span className="time">{t('contacts.timeWeek')}</span>
         </div>
         <div className="schedule-row">
-          <span className="day">Сб – Вс</span>
-          <span className="time off">Выходной</span>
+          <span className="day">{t('contacts.dayWeekend')}</span>
+          <span className="time off">{t('contacts.timeWeekend')}</span>
         </div>
       </div>
 
       {/* Соцсети */}
       <div className="contacts-socials">
-        <div className="socials-title">Мы в социальных сетях</div>
+        <div className="socials-title">{t('contacts.socialsTitle')}</div>
         <div className="socials-row">
           {socials.map((s) => (
             <a
@@ -105,7 +108,7 @@ export function ContactsTab() {
       {/* Адрес */}
       <div className="contacts-address">
         <MapPin size={14} />
-        <span>г. Алматы, Микрорайон Коктем-3, 21</span>
+        <span>{t('contacts.address')}</span>
       </div>
     </div>
   )

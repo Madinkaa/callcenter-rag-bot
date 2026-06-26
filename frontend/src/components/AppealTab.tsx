@@ -5,28 +5,31 @@ import {
   UserPlus,
   Phone,
 } from 'lucide-react'
+import { useTranslation } from '../i18n/useTranslation'
 
 export function AppealTab() {
+  const { t } = useTranslation()
+
   return (
     <div className="appeal-page">
       {/* Шаг 1: Стать клиентом */}
       <div className="appeal-step">
         <div className="appeal-step-num">1</div>
         <div className="appeal-step-body">
-          <div className="appeal-step-title">Стать клиентом</div>
+          <div className="appeal-step-title">{t('appeal.step1')}</div>
 
           <div className="appeal-option-card">
             <div className="appeal-option-header">
               <div className="appeal-option-icon new">
                 <UserPlus size={18} />
               </div>
-              <div className="appeal-option-label">Стать клиентом</div>
+              <div className="appeal-option-label">{t('appeal.newClientLabel')}</div>
             </div>
             <p className="appeal-option-desc">
-              Нет личного кабинета? Ознакомьтесь с инструкцией по подключению и скачайте шаблон заявления.
+              {t('appeal.newClientDesc')}
             </p>
             <div className="appeal-option-meta">
-              <span>support@npck.kz</span>
+              <span>{t('appeal.newClientMeta')}</span>
             </div>
             <div className="appeal-option-actions">
               <a
@@ -36,7 +39,7 @@ export function AppealTab() {
                 className="appeal-option-btn btn-green"
               >
                 <ExternalLink size={14} />
-                Инструкция
+                {t('appeal.instruction')}
               </a>
               <a
                 href="/Шаблон.docx?v=2"
@@ -44,7 +47,7 @@ export function AppealTab() {
                 className="appeal-option-btn btn-green-outline"
               >
                 <Download size={14} />
-                Шаблон
+                {t('appeal.template')}
               </a>
             </div>
           </div>
@@ -55,22 +58,22 @@ export function AppealTab() {
       <div className="appeal-step">
         <div className="appeal-step-num">2</div>
         <div className="appeal-step-body">
-          <div className="appeal-step-title">Подать обращение</div>
+          <div className="appeal-step-title">{t('appeal.step2')}</div>
 
           <div className="appeal-option-card">
             <div className="appeal-option-header">
               <div className="appeal-option-icon existing">
                 <img src="/icons8-client-64.png" alt="Клиент" className="appeal-option-img" />
               </div>
-              <div className="appeal-option-label">Являюсь клиентом</div>
+              <div className="appeal-option-label">{t('appeal.existingClientLabel')}</div>
             </div>
             <p className="appeal-option-desc">
-              Есть доступ к личному кабинету? Подайте заявку онлайн.
+              {t('appeal.existingClientDesc')}
             </p>
             <div className="appeal-option-meta">
-              <span>Быстрая подача</span>
+              <span>{t('appeal.existingClientMeta1')}</span>
               <span className="dot" />
-              <span>Отслеживание статуса</span>
+              <span>{t('appeal.existingClientMeta2')}</span>
             </div>
             <a
               href="http://app.help-desk.kisc.kz/otrs/customer.pl?M=10&Actions=ServiceCatalogue&Param=%7B%22SearchString%22%3A%22%22%2C%22ServiceID%22%3A%22%22%2C%22TopService%22%3A%5B%222%22%2C%223%22%2C%224%22%2C%225%22%5D%2C%22ServiceIDTT%22%3A%22%22%7D"
@@ -79,7 +82,7 @@ export function AppealTab() {
               className="appeal-option-btn btn-gold"
             >
               <Globe size={14} />
-              Личный кабинет
+              {t('appeal.personalCabinet')}
             </a>
           </div>
         </div>
@@ -89,7 +92,7 @@ export function AppealTab() {
       <div className="appeal-bottom-hint">
         <Phone size={12} />
         <span>
-          Нужна помощь? Звоните <strong>+7 727 297 91 00</strong>
+          {t('appeal.hint')} <strong>+7 727 297 91 00</strong>
         </span>
       </div>
     </div>

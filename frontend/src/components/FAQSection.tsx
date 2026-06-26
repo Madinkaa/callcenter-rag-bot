@@ -1,10 +1,14 @@
 import { useState } from 'react'
 import { ChevronDown, ChevronRight, HelpCircle, MessageCircle } from 'lucide-react'
 import { faqCategories, FAQItem } from '../data/faqData'
+import { useTranslation } from '../i18n/useTranslation'
+import { useI18n } from '../i18n/I18nContext'
 
 export function FAQSection() {
   const [openCategory, setOpenCategory] = useState<string | null>(null)
   const [openQuestions, setOpenQuestions] = useState<Set<string>>(new Set())
+  const { t } = useTranslation()
+  const { lang } = useI18n()
 
   const toggleCategory = (id: string) => {
     setOpenCategory((prev) => (prev === id ? null : id))
@@ -27,8 +31,12 @@ export function FAQSection() {
     <div className="faq-section">
       <div className="faq-heading">
         <HelpCircle size={16} />
-        <span>FAQ</span>
+        <span>{t('faq.heading')}</span>
       </div>
+
+      {lang !== 'ru' && (
+        <div className="faq-lang-note">{t('faq.langNote')}</div>
+      )}
 
       <div className="faq-categories">
         {faqCategories.map((cat) => {
@@ -71,7 +79,7 @@ export function FAQSection() {
               )}
 
               {isOpen && cat.items.length === 0 && (
-                <div className="faq-empty">Вопросы по этой категории появятся позже.</div>
+                <div className="faq-empty">{t('faq.empty')}</div>
               )}
             </div>
           )

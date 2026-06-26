@@ -9,6 +9,7 @@ import { ContactsTab } from './ContactsTab'
 import { AppealTab } from './AppealTab'
 import { FAQSection } from './FAQSection'
 import { sendMessage, resetSession } from '../api/client'
+import { useTranslation } from '../i18n/useTranslation'
 
 interface Msg {
   id: string
@@ -39,6 +40,7 @@ export function ChatWidget() {
   const [messages, setMessages] = useState<Msg[]>([])
   const [thinking, setThinking] = useState(false)
   const bodyRef = useRef<HTMLDivElement>(null)
+  const { t } = useTranslation()
 
   useEffect(() => {
     const saved = loadSession()
@@ -74,18 +76,18 @@ export function ChatWidget() {
       setMessages(finalMessages)
       saveSession(sessionId, finalMessages)
     } catch (err: any) {
-      let content = 'Не удалось связаться с сервером. Попробуйте позже.'
+      let content = t('error.generic')
       if (axios.isAxiosError(err)) {
         if (err.code === 'ECONNABORTED' || err.code === 'ETIMEDOUT') {
-          content = 'Сервер долго не отвечает (возможно, просыпается после простоя). Попробуйте ещё раз через 30 секунд.'
+          content = t('error.timeout')
         } else if (err.response?.status === 502 || err.response?.status === 503) {
-          content = 'Сервис временно недоступен. Попробуйте через минуту.'
+          content = t('error.502')
         } else if (err.response?.status === 429) {
-          content = 'Лимит запросов к ИИ исчерпан. Попробуйте через несколько минут.'
+          content = t('error.429')
         } else if (err.response?.status === 500) {
-          content = 'Ошибка на сервере при обработке запроса. Попробуйте позже.'
+          content = t('error.500')
         } else if (!err.response) {
-          content = 'Нет соединения с сервером. Проверьте интернет или попробуйте позже.'
+          content = t('error.network')
         }
       }
       const errMsg: Msg = {
@@ -112,19 +114,19 @@ export function ChatWidget() {
   }
 
   const headerTitle =
-    tab === 'home' ? 'Контакт-центр "АО НПК"' :
-    tab === 'appeal' ? 'Подать обращение' :
-    'Контакты'
+    tab === 'home' ? t('header.homeTitle') :
+    tab === 'appeal' ? t('tab.appeal') :
+    t('tab.contacts')
 
   const headerStatus =
-    tab === 'home' ? 'Онлайн' :
-    tab === 'appeal' ? 'Служба поддержки' :
-    'Колл-центр'
+    tab === 'home' ? t('status.online') :
+    tab === 'appeal' ? t('status.support') :
+    t('status.callcenter')
 
   if (!open) {
     return (
       <div className="npck-page">
-        <button className="fab" onClick={() => setOpen(true)} aria-label="Открыть чат">
+        <button className="fab" onClick={() => setOpen(true)} aria-label={t('header.openChat') ?? 'Открыть чат'}>
           <MessageSquare size={24} />
         </button>
       </div>
@@ -134,12 +136,12 @@ export function ChatWidget() {
   const getGreeting = () => {
     const hour = new Date().getHours()
     if (hour >= 5 && hour < 12) {
-      return 'Доброе утро! Я — НПКОТ. Задайте вопрос — найду ответ в базе знаний.'
+      return t('greeting.morning')
     }
     if (hour >= 12 && hour < 18) {
-      return 'Добрый день! Я — НПКОТ. Задайте вопрос — найду ответ в базе знаний.'
+      return t('greeting.afternoon')
     }
-    return 'Добрый вечер! Я — НПКОТ. Задайте вопрос — найду ответ в базе знаний.'
+    return t('greeting.evening')
   }
 
   return (

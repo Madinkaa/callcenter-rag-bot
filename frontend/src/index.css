@@ -133,6 +133,34 @@ input, textarea { font-family: inherit; }
 .header-action:hover,
 .header-close:hover { background: rgba(255,255,255,.25); }
 
+.lang-switcher {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 6px;
+}
+.lang-btn {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 4px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,.25);
+  background: transparent;
+  color: rgba(255,255,255,.7);
+  cursor: pointer;
+  line-height: 1;
+  transition: all .15s;
+}
+.lang-btn:hover {
+  background: rgba(255,255,255,.15);
+  color: #fff;
+}
+.lang-btn.active {
+  background: #fff;
+  color: var(--primary);
+  border-color: #fff;
+}
+
 .body {
   flex: 1;
   overflow-y: auto;
@@ -909,6 +937,16 @@ input, textarea { font-family: inherit; }
   padding: 14px;
   font-size: 13px;
   color: var(--text-tertiary);
+  text-align: center;
+}
+.faq-lang-note {
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  background: #FEF3C7;
+  border-radius: 8px;
+  margin-bottom: 8px;
   text-align: center;
 }
 .faq-items {
