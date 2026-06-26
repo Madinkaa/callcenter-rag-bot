@@ -27,6 +27,7 @@ sessions: dict[str, RAGAgent] = {}
 class ChatRequest(BaseModel):
     message: str
     session_id: str = "default"
+    lang: str = "auto"   # ru | kz | en | auto
 
 
 class ChatResponse(BaseModel):
@@ -45,7 +46,7 @@ def chat(req: ChatRequest):
 
     agent = sessions.setdefault(req.session_id, RAGAgent())
     try:
-        answer = agent.chat(req.message)
+        answer = agent.chat(req.message, lang=req.lang)
     except Exception as e:
         err_detail = str(e)
         # Если лимит и Groq, и OpenAI исчерпан — возвращаем 429

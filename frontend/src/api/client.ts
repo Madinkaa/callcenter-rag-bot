@@ -11,14 +11,15 @@ export const api = axios.create({
 export interface ChatRequest {
   message: string
   session_id: string
+  lang?: string
 }
 
 export interface ChatResponse {
   answer: string
 }
 
-export async function sendMessage(sessionId: string, message: string): Promise<string> {
-  const { data } = await api.post<ChatResponse>('/chat', { session_id: sessionId, message })
+export async function sendMessage(sessionId: string, message: string, lang: string = 'auto'): Promise<string> {
+  const { data } = await api.post<ChatResponse>('/chat', { session_id: sessionId, message, lang })
   return data.answer
 }
 

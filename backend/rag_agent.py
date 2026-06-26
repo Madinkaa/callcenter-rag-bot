@@ -39,7 +39,29 @@ VAGUE_KEYWORDS = {
 
 VAGUE_QUESTION = "Подскажите, пожалуйста, что именно вас интересует? Например, подключение к ЦОИД, СПБС, СОБС, Антифрод-центру, или может, тарифы на конкретную услугу?"
 
+KAZAKH_CHARS = set("әіңғүұқөһ")
+
+
+def detect_language(text: str) -> str:
+    """Определяет язык текста: ru | kz | en."""
+    text_lower = text.lower()
+    if any(ch in text_lower for ch in KAZAKH_CHARS):
+        return "kz"
+    # Проверяем на кириллицу (без казахских = русский)
+    if any("а" <= ch <= "я" or ch in "ёқәіңғүұөһ" for ch in text_lower):
+        return "ru"
+    return "en"
+
+
+LANGUAGE_RULES = {
+    "ru": "Отвечай строго на русском языке.",
+    "kz": "Жауап беруді тек қазақ тілінде жүргіз.",
+    "en": "Answer strictly in English.",
+}
+
 SYSTEM_PROMPT = """Ты — интеллектуальный ИИ-ассистент колл-центра НПК.
+
+{lang_rule}
 
 Твоя задача — анализировать предоставленный ниже контекст и давать точный ответ ПО ТЕМЕ вопроса.
 
@@ -165,11 +187,20 @@ class RAGAgent:
     def __init__(self):
         self.history: list[dict] = []
 
-    def chat(self, user_message: str) -> str:
+    def chat(self, user_message: str, lang: str = "auto") -> str:
+        # Определяем язык
+        detected = detect_language(user_message) if lang == "auto" else lang
+        lang_rule = LANGUAGE_RULES.get(detected, LANGUAGE_RULES["ru"])
+
         # ── ШАГ 1: Если вопрос расплывчатый — сразу уточняем, НЕ вызывая LLM ──
         if is_vague(user_message):
             self.history.append({"role": "user", "content": user_message})
-            answer = VAGUE_QUESTION
+            # Переводим уточняющий вопрос на язык пользователя
+            vague_translations = {
+                "kz": "Өтінемін, нақты не қызықтырады? Мысалы, ЦОИД, СПБС, СОБС, Антифрод-орталыққа қосылу немесе нақты қызметтің тарифі.",
+                "en": "Please tell me what exactly you are interested in? For example, connecting to COID, SPBS, SOBS, Anti-Fraud Center, or tariffs for a specific service.",
+            }
+            answer = vague_translations.get(detected, VAGUE_QUESTION)
             self.history.append({"role": "assistant", "content": answer})
             return answer
 
@@ -187,7 +218,10 @@ class RAGAgent:
 
         # ── ШАГ 3: Ищем контекст и вызываем LLM ──
         context = search(search_query)
-        system = {"role": "system", "content": SYSTEM_PROMPT.format(context=context)}
+        system = {
+            "role": "system",
+            "content": SYSTEM_PROMPT.format(context=context, lang_rule=lang_rule),
+        }
         self.history.append({"role": "user", "content": user_message})
         messages = [system] + self.history[-MAX_HISTORY:]
 

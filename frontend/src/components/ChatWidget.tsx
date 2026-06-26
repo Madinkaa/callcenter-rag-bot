@@ -10,6 +10,7 @@ import { AppealTab } from './AppealTab'
 import { FAQSection } from './FAQSection'
 import { sendMessage, resetSession } from '../api/client'
 import { useTranslation } from '../i18n/useTranslation'
+import { useI18n } from '../i18n/I18nContext'
 
 interface Msg {
   id: string
@@ -41,6 +42,7 @@ export function ChatWidget() {
   const [thinking, setThinking] = useState(false)
   const bodyRef = useRef<HTMLDivElement>(null)
   const { t } = useTranslation()
+  const { lang } = useI18n()
 
   useEffect(() => {
     const saved = loadSession()
@@ -70,7 +72,7 @@ export function ChatWidget() {
     setThinking(true)
 
     try {
-      const answer = await sendMessage(sessionId, text)
+      const answer = await sendMessage(sessionId, text, lang)
       const aiMsg: Msg = { id: crypto.randomUUID(), sender: 'ai', content: answer, ts: Date.now() }
       const finalMessages = [...nextMessages, aiMsg]
       setMessages(finalMessages)
