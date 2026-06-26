@@ -471,14 +471,14 @@ input, textarea { font-family: inherit; }
 .socials-row {
   display: flex;
   justify-content: space-between;
-  gap: 6px;
+  gap: 8px;
 }
 .social-chip {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 6px;
-  padding: 10px 6px 8px;
+  padding: 8px 4px 6px;
   background: #fff;
   border: 1px solid var(--border);
   border-radius: 10px;
@@ -494,8 +494,8 @@ input, textarea { font-family: inherit; }
   border-color: var(--social-color, var(--primary));
 }
 .social-chip-icon {
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 8px;
   background: var(--social-color, var(--primary));
   color: #fff;
@@ -505,11 +505,15 @@ input, textarea { font-family: inherit; }
   flex-shrink: 0;
 }
 .social-chip-label {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: .04em;
+  letter-spacing: .02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 /* Address */
