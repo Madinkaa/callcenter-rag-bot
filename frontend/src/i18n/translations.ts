@@ -80,7 +80,7 @@ export const translations: Record<Lang, Record<string, string>> = {
   kz: {
     // Tabs
     'tab.home': 'Басты бет',
-    'tab.appeal': 'Шағым жіберу',
+    'tab.appeal': 'Өтініш қалдыру',
     'tab.contacts': 'Байланыс',
 
     // Header
@@ -128,14 +128,14 @@ export const translations: Record<Lang, Record<string, string>> = {
     'contacts.address': 'Алматы қ., Көктем-3 шағын ауданы, 21',
 
     // Appeal tab
-    'appeal.step1': 'Клиент болу',
-    'appeal.step2': 'Шағым жіберу',
-    'appeal.newClientLabel': 'Клиент болу',
+    'appeal.step1': 'Тұтынушы болу',
+    'appeal.step2': 'Өтініш қалдыру',
+    'appeal.newClientLabel': 'Тұтынушы болу',
     'appeal.newClientDesc': 'Жеке кабинет жоқ па? Қосылу нұсқаулығымен танысып, өтініш үлгісін жүктеп алыңыз.',
     'appeal.newClientMeta': 'support@npck.kz',
     'appeal.instruction': 'Нұсқаулық',
     'appeal.template': 'Үлгі',
-    'appeal.existingClientLabel': 'Клиенттімін',
+    'appeal.existingClientLabel': 'Тұтынушымын',
     'appeal.existingClientDesc': 'Жеке кабинетке қол жеткізу бар ма? Өтінішті онлайн жіберіңіз.',
     'appeal.existingClientMeta1': 'Жедел жіберу',
     'appeal.existingClientMeta2': 'Мәртебені қадағалау',
