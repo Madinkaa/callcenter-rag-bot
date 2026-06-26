@@ -160,7 +160,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'tab.contacts': 'Contacts',
 
     // Header
-    'header.homeTitle': 'Contact Center "AO NPK"',
+    'header.homeTitle': 'Contact Center "AO NPCK"',
     'header.openChat': 'Open chat',
 
     // Header statuses
