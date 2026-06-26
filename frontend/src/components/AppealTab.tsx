@@ -6,9 +6,18 @@ import {
   Phone,
 } from 'lucide-react'
 import { useTranslation } from '../i18n/useTranslation'
+import { useI18n } from '../i18n/I18nContext'
 
 export function AppealTab() {
   const { t } = useTranslation()
+  const { lang } = useI18n()
+
+  const instructionUrl =
+    lang === 'kz'
+      ? 'https://npck.kz/kk/klient-bolu-t-rtibi/'
+      : lang === 'en'
+        ? 'https://npck.kz/en/how-to-become-a-client-2/'
+        : 'https://npck.kz/kak-stat-klientom-2/'
 
   return (
     <div className="appeal-page">
@@ -33,7 +42,7 @@ export function AppealTab() {
             </div>
             <div className="appeal-option-actions">
               <a
-                href="https://npck.kz/kak-stat-klientom-2/"
+                href={instructionUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="appeal-option-btn btn-green"
