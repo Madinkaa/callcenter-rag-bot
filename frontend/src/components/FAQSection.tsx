@@ -87,7 +87,7 @@ function FAQQuestionItem({
     <div className={`faq-item ${isOpen ? 'open' : ''}`}>
       <button className="faq-question" onClick={onToggle}>
         <span className="faq-q-num">{idx + 1}</span>
-        <span className="faq-q-text">{item.q}</span>
+        <span className="faq-q-text">{item.question}</span>
         <ChevronDown size={14} className="faq-q-chevron" />
       </button>
       {isOpen && (
@@ -95,7 +95,7 @@ function FAQQuestionItem({
           <div className="faq-answer-accent" />
           <div className="faq-answer-content">
             <MessageCircle size={14} className="faq-a-icon" />
-            <div className="faq-a-text">{item.a}</div>
+            <div className="faq-a-text">{item.answer}</div>
           </div>
         </div>
       )}
