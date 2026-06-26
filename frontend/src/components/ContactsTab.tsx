@@ -45,7 +45,6 @@ export function ContactsTab() {
       {/* Заголовок */}
       <div className="contacts-hero">
         <img className="contacts-avatar" src="/npck-avatar.png" alt="НПК" />
-        <h3>Контакты АО НПК</h3>
         <p>Мы всегда на связи и готовы помочь</p>
       </div>
 

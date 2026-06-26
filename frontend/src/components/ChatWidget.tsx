@@ -114,7 +114,7 @@ export function ChatWidget() {
   const headerTitle =
     tab === 'home' ? 'Контакт-центр "АО НПК"' :
     tab === 'appeal' ? 'Подать обращение' :
-    'Контакты НПК'
+    'Контакты "АО НПК"'
 
   const headerStatus =
     tab === 'home' ? 'Онлайн' :
