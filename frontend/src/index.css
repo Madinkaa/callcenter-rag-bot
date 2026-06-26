@@ -628,6 +628,84 @@ input, textarea { font-family: inherit; }
   transform: translateX(2px);
 }
 
+/* Акцентная ссылка-карточка */
+.appeal-link-card--accent {
+  padding: 16px 18px;
+  border-radius: 14px;
+}
+.appeal-link-card--accent .appeal-link-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+}
+
+/* Мини-карточка (шаблон) */
+.appeal-mini-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,.04);
+}
+.appeal-mini-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+.appeal-mini-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.appeal-mini-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.appeal-mini-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.appeal-mini-sub {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.appeal-mini-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--primary);
+  color: #fff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  flex-shrink: 0;
+  transition: transform .1s, filter .15s;
+  cursor: pointer;
+  border: 0;
+}
+.appeal-mini-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
 /* Карточки опций */
 .appeal-cards {
   display: flex;
