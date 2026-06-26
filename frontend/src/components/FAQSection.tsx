@@ -49,15 +49,24 @@ export function FAQSection() {
 
               {isOpen && cat.items.length > 0 && (
                 <div className="faq-items">
-                  {cat.items.map((item, idx) => (
-                    <FAQQuestionItem
-                      key={`${cat.id}-${idx}`}
-                      item={item}
-                      idx={idx}
-                      isOpen={openQuestions.has(`${cat.id}-${idx}`)}
-                      onToggle={() => toggleQuestion(`${cat.id}-${idx}`)}
-                    />
-                  ))}
+                  {cat.items.map((item, idx, arr) => {
+                    const prevGroup = idx > 0 ? arr[idx - 1].group : undefined
+                    const showGroup = item.group && item.group !== prevGroup
+                    return (
+                      <>
+                        {showGroup && (
+                          <div className="faq-group-header">{item.group}</div>
+                        )}
+                        <FAQQuestionItem
+                          key={`${cat.id}-${idx}`}
+                          item={item}
+                          idx={idx}
+                          isOpen={openQuestions.has(`${cat.id}-${idx}`)}
+                          onToggle={() => toggleQuestion(`${cat.id}-${idx}`)}
+                        />
+                      </>
+                    )
+                  })}
                 </div>
               )}
 
