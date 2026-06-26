@@ -44,7 +44,7 @@ export function ContactsTab() {
     <div className="contacts-wrapper">
       {/* Заголовок */}
       <div className="contacts-hero">
-        <div className="contacts-avatar">Н</div>
+        <img className="contacts-avatar" src="/npck-avatar.png" alt="НПК" />
         <h3>Связаться с нами</h3>
         <p>Мы всегда на связи и готовы помочь</p>
       </div>
@@ -58,7 +58,7 @@ export function ContactsTab() {
           </div>
         </div>
         <div className="phone-badge">Телефон колл-центра</div>
-        <div className="phone-number">+7 7272 97 91 00</div>
+        <div className="phone-number">+7 727 297 91 00</div>
         <div className="phone-divider" />
         <div className="phone-sub">Звонок по тарифам вашего оператора</div>
         <a href="tel:+77272979100" className="phone-call-btn">

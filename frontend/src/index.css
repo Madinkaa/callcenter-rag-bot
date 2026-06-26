@@ -304,12 +304,8 @@ input, textarea { font-family: inherit; }
   height: 56px;
   border-radius: 16px;
   background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-  font-weight: 700;
+  display: block;
+  object-fit: cover;
   box-shadow: 0 8px 20px rgba(0,107,84,.25);
 }
 .contacts-hero h3 {

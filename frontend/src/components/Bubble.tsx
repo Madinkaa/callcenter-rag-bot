@@ -1,3 +1,5 @@
+import { Bot } from 'lucide-react'
+
 interface Props {
   sender: 'user' | 'ai'
   content: string
@@ -28,7 +30,7 @@ export function Bubble({ sender, content, time }: Props) {
 
   return (
     <div className="bubble">
-      <div className="av">Н</div>
+      <div className="av"><Bot size={18} /></div>
       <div className="inner">
         <div className="accent" />
         <div className="msg">
@@ -43,7 +45,7 @@ export function Bubble({ sender, content, time }: Props) {
 export function TypingBubble() {
   return (
     <div className="bubble">
-      <div className="av">Н</div>
+      <div className="av"><Bot size={18} /></div>
       <div className="inner">
         <div className="accent" />
         <div className="typing">

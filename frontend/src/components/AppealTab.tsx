@@ -101,7 +101,7 @@ export function AppealTab() {
       <div className="appeal-bottom-hint">
         <Phone size={12} />
         <span>
-          Нужна помощь? Звоните <strong>+7 7272 97 91 00</strong>
+          Нужна помощь? Звоните <strong>+7 727 297 91 00</strong>
         </span>
       </div>
     </div>
