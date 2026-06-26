@@ -7,6 +7,7 @@ import { InputBar } from './InputBar'
 import { Tabs, TabKey } from './Tabs'
 import { ContactsTab } from './ContactsTab'
 import { AppealTab } from './AppealTab'
+import { FAQSection } from './FAQSection'
 import { sendMessage, resetSession } from '../api/client'
 
 interface Msg {
@@ -154,10 +155,10 @@ export function ChatWidget() {
           <>
             <div className="body" ref={bodyRef}>
               {messages.length === 0 && (
-                <Bubble
-                  sender="ai"
-                  content={getGreeting()}
-                />
+                <>
+                  <Bubble sender="ai" content={getGreeting()} />
+                  <FAQSection />
+                </>
               )}
               {messages.map((m) => (
                 <Bubble key={m.id} sender={m.sender} content={m.content} time={m.ts} />
