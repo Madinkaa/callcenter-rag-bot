@@ -112,7 +112,7 @@ export function ChatWidget() {
   }
 
   const headerTitle =
-    tab === 'home' ? 'Контакт-центр НПК' :
+    tab === 'home' ? 'Контакт-центр "АО НПК"' :
     tab === 'appeal' ? 'Подать обращение' :
     'Контакты НПК'
 

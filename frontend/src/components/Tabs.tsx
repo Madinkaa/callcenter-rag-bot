@@ -10,8 +10,8 @@ interface Props {
 export function Tabs({ active, onChange }: Props) {
   const items = [
     { key: 'home' as TabKey, label: 'Главная', icon: <Sparkles size={16} /> },
-    { key: 'appeal' as TabKey, label: 'Создать обращение', icon: <FileText size={16} /> },
-    { key: 'contacts' as TabKey, label: 'Связаться с нами', icon: <Phone size={16} /> },
+    { key: 'appeal' as TabKey, label: 'Подать обращение', icon: <FileText size={16} /> },
+    { key: 'contacts' as TabKey, label: 'Контакты АО НПК', icon: <Phone size={16} /> },
   ]
 
   return (
