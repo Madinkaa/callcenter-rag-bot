@@ -746,6 +746,12 @@ input, textarea { font-family: inherit; }
 .appeal-option-icon.existing {
   background: linear-gradient(135deg, #D4B877 0%, #c4a35a 100%);
 }
+.appeal-option-img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
 .appeal-option-label {
   font-size: 14px;
   font-weight: 700;

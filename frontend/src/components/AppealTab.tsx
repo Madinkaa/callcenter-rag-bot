@@ -1,7 +1,6 @@
 import {
   Download,
   Globe,
-  LogIn,
   ExternalLink,
   UserPlus,
   Phone,
@@ -21,7 +20,7 @@ export function AppealTab() {
               <div className="appeal-option-icon new">
                 <UserPlus size={18} />
               </div>
-              <div className="appeal-option-label">Новый клиент</div>
+              <div className="appeal-option-label">Стать клиентом</div>
             </div>
             <p className="appeal-option-desc">
               Нет личного кабинета? Ознакомьтесь с инструкцией по подключению и скачайте шаблон заявления.
@@ -61,7 +60,7 @@ export function AppealTab() {
           <div className="appeal-option-card">
             <div className="appeal-option-header">
               <div className="appeal-option-icon existing">
-                <LogIn size={18} />
+                <img src="/icons8-client-64.png" alt="Клиент" className="appeal-option-img" />
               </div>
               <div className="appeal-option-label">Являюсь клиентом</div>
             </div>
