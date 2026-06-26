@@ -130,6 +130,17 @@ export function ChatWidget() {
     )
   }
 
+  const getGreeting = () => {
+    const hour = new Date().getHours()
+    if (hour >= 5 && hour < 12) {
+      return 'Доброе утро! Я — ИИ-помощник НПК. Задайте вопрос — найду ответ в базе знаний.'
+    }
+    if (hour >= 12 && hour < 18) {
+      return 'Добрый день! Я — ИИ-помощник НПК. Задайте вопрос — найду ответ в базе знаний.'
+    }
+    return 'Добрый вечер! Я — ИИ-помощник НПК. Задайте вопрос — найду ответ в базе знаний.'
+  }
+
   return (
     <div className="npck-page">
       <div className="widget">
@@ -145,7 +156,7 @@ export function ChatWidget() {
               {messages.length === 0 && (
                 <Bubble
                   sender="ai"
-                  content="Здравствуйте! Я — ИИ-помощник НПК. Задайте вопрос — найду ответ в базе знаний."
+                  content={getGreeting()}
                 />
               )}
               {messages.map((m) => (
